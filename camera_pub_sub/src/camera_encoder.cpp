@@ -2,18 +2,21 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <thread>
 
-#include "cv_bridge/cv_bridge.h"
-#include "image_transport/image_transport.hpp"
-#include "opencv2/core/mat.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/videoio.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/header.hpp"
 #include "std_srvs/srv/set_bool.hpp"
 #include "std_srvs/srv/trigger.hpp"
-#include "rcl_interfaces/srv/describe_parameters.hpp"
-#include <thread>
+#include "image_transport/image_transport.hpp"
+
+#include "cv_bridge/cv_bridge.h"
+#include "opencv2/core/mat.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/videoio.hpp"
+
+#include "custom_interfaces/srv/set_resolution.hpp"
+#include "custom_interfaces/srv/set_frame_rate.hpp"
 #include "usb_device.h"
 
 
@@ -21,6 +24,7 @@ rclcpp::Node::SharedPtr node;
 
 std::ostringstream gstreamer_api;
 cv::VideoCapture videoCapture;
+
 std::string camera_name;
 std::string device_path;
 std::string compression_format;
@@ -34,12 +38,9 @@ int cameraCapWidth;
 int cameraCapHeight;
 int cameraCapFPS;
 
-rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr request_image_pub;
 
 void build_gstreamer_api()
 {
-    gstreamer_api.clear();
-    
     // GStreamer pipeline for capturing from the camera, used by OpenCV
     if (hostMachine == "jetson")
     {
@@ -118,74 +119,22 @@ bool toggle_camera(bool enableCamera)
     return success;
 }
 
-bool rebuild_camera_stream()
-{
-    toggle_camera(false);
-    build_gstreamer_api();
-
-    return toggle_camera(true);
-}
-
 void toggle_camera_srv_process(const std::shared_ptr<std_srvs::srv::SetBool::Request> request,
           std::shared_ptr<std_srvs::srv::SetBool::Response> response)
 {
     response->success = toggle_camera(request->data);
 }
 
-void set_resolution_srv_process(const std::shared_ptr<rcl_interfaces::srv::DescribeParameters::Request> request,
-          std::shared_ptr<rcl_interfaces::srv::DescribeParameters::Response> response)
+void set_resolution_srv_process(const std::shared_ptr<custom_interfaces::srv::SetResolution::Request> request,
+          std::shared_ptr<custom_interfaces::srv::SetResolution::Response> response)
 {
-    // TEMP solution, can't do custom srvs for current web gui sys
-    bool resSuccess = set_resolution(stoi(request->names[0]), stoi(request->names[1]));
-    bool frameSuccess = set_framerate(stoi(request->names[2]));
-
-    bool success = resSuccess && frameSuccess;
-    response->descriptors.emplace_back();
-    response->descriptors[0].name = success ? "1" : "0";
+    response->success = set_resolution(request->width, request->height);
 }
 
-void request_image_srv_process(const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
-          std::shared_ptr<std_srvs::srv::Trigger::Response> response)
+void set_framerate_srv_process(const std::shared_ptr<custom_interfaces::srv::SetFrameRate::Request> request,
+          std::shared_ptr<custom_interfaces::srv::SetFrameRate::Response> response)
 {
-    cv::Mat frame;
-    cv::Mat resizedFrame;
-    std_msgs::msg::Header header;
-    sensor_msgs::msg::Image::SharedPtr msg;
-    bool success = false;
-
-    int origCapWidth = cameraCapWidth;
-    int origCapHeight = cameraCapHeight;
-
-    // Change globals
-    cameraCapWidth = 1920;
-    cameraCapHeight = 1080;
-
-    rebuild_camera_stream();
-
-    // TEMP solution, can't do custom srvs for current web gui sys
-    if (videoCapture.isOpened())
-    {
-        videoCapture >> frame;
-
-        if (!frame.empty()) 
-        {
-            cv::resize(frame, resizedFrame, cv::Size(1920, 1080), 0.0, 0.0, cv::INTER_AREA);
-            msg = cv_bridge::CvImage(header, "bgr8", resizedFrame).toImageMsg();
-            
-            request_image_pub->publish(*msg);
-            rclcpp::spin_some(node);
-
-            success = true;
-        }
-    }
-
-    // Change back to original feed resolution
-    cameraCapWidth = origCapWidth;
-    cameraCapHeight = origCapHeight;
-
-    rebuild_camera_stream();
-
-    response->success = success;
+    response->success = set_framerate(request->frame_rate);
 }
 
 int main(int argc, char ** argv)
@@ -233,26 +182,23 @@ int main(int argc, char ** argv)
 
     std::string base_topic = camera_name + "/transport";
     std::string toggle_srv_name = camera_name + "/toggle_camera";
-    std::string request_image_srv_name = camera_name + "/request_image";
+    // std::string request_image_srv_name = camera_name + "/request_image";
     std::string request_image_pub_name = camera_name + "/request_image_pub";
     std::string set_resolution_srv_name = camera_name + "/set_resolution";
+    std::string set_framerate_srv_name = camera_name + "/set_framerate";
 
     // TODO - Switch to image_transport::CameraPublisher to get access to qos
     image_transport::ImageTransport transport(node);
     image_transport::Publisher publisher = transport.advertise(base_topic, 1);
 
-    rclcpp::SystemDefaultsQoS qos;
-    request_image_pub = 
-        node->create_publisher<sensor_msgs::msg::Image>(request_image_pub_name, qos);
-
     auto toggle_camera_srv = 
         node->create_service<std_srvs::srv::SetBool>(toggle_srv_name, &toggle_camera_srv_process);
 
-    auto request_image_srv = 
-        node->create_service<std_srvs::srv::Trigger>(request_image_srv_name, &request_image_srv_process);
-
     auto set_resolution_srv =
-        node->create_service<rcl_interfaces::srv::DescribeParameters>(set_resolution_srv_name, &set_resolution_srv_process);
+        node->create_service<custom_interfaces::srv::SetResolution>(set_resolution_srv_name, &set_resolution_srv_process);
+
+    auto set_framerate_srv =
+        node->create_service<custom_interfaces::srv::SetFrameRate>(set_framerate_srv_name, &set_framerate_srv_process);
 
     device_path = get_device_path(serial_ID);
 

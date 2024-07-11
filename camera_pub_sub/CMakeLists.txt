@@ -19,6 +19,7 @@ find_package(std_srvs REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV 4 REQUIRED)
+find_package(custom_interfaces REQUIRED)
 
 # find_package(PkgConfig REQUIRED)
 # pkg_check_modules(libusb REQUIRED libusb-1.0)
@@ -26,7 +27,7 @@ find_package(OpenCV 4 REQUIRED)
 
 # Camera encoder
 add_executable(camera_encoder src/camera_encoder.cpp src/usb_device.cpp src/helper_functions.cpp)
-ament_target_dependencies(camera_encoder rclcpp sensor_msgs std_srvs image_transport cv_bridge OpenCV)
+ament_target_dependencies(camera_encoder rclcpp sensor_msgs std_srvs image_transport cv_bridge OpenCV custom_interfaces)
 
 # Camera decoder
 add_executable(camera_decoder src/camera_decoder.cpp)
@@ -51,6 +52,8 @@ install(TARGETS
 install(
     DIRECTORY resources
     DESTINATION share/${PROJECT_NAME})
+
+    
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
