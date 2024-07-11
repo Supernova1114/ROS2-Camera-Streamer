@@ -2,18 +2,7 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from dataclasses import dataclass
 
-# GLOBAL PARAMS (Can be overriden in Camera class)
-
-IMAGE_SEND_WIDTH = 1280
-IMAGE_SEND_HEIGHT = 720
-IMAGE_SEND_FPS = 15
-JPEG_QUALITY = 10
-
-CAMERA_CAP_WIDTH = 1280
-CAMERA_CAP_HEIGHT = 720
-CAMERA_CAP_FPS = 30
-
-HOST_MACHINE = "amd64"
+HOST_MACHINE = "amd64" # jetson or amd64
 
 @dataclass
 class CameraEncoder():
@@ -21,14 +10,18 @@ class CameraEncoder():
     camera_name: str = ""
     serial_ID: str = ""
 
-    send_width: int = IMAGE_SEND_WIDTH
-    send_height: int = IMAGE_SEND_HEIGHT
-    send_framerate: int = IMAGE_SEND_FPS
-    jpeg_quality: int = JPEG_QUALITY # 1 - 100   
+    cap_width: int = 1280
+    cap_height: int = 720
+    cap_framerate: int = 30
 
-    cap_width: int = CAMERA_CAP_WIDTH
-    cap_height: int = CAMERA_CAP_HEIGHT
-    cap_framerate: int = CAMERA_CAP_FPS
+    send_width: int = 1280
+    send_height: int = 720
+    send_framerate: int = 15
+
+    jpeg_quality: int = 10 # 1 - 100   
+
+    auto_enable: bool = False
+    host_machine: str = HOST_MACHINE
 
     def get_node(self) -> Node:
         
@@ -46,8 +39,8 @@ class CameraEncoder():
                 {'image_send_width': self.send_width},
                 {'image_send_height': self.send_height},
                 {'image_send_fps': self.send_framerate},
-                {'auto_enable_camera': False},
-                {'host_machine': HOST_MACHINE},
+                {'auto_enable_camera': self.auto_enable},
+                {'host_machine': self.host_machine},
                 {self.camera_name + '.transport.format': 'jpeg'},
                 {self.camera_name + '.transport.jpeg_quality': self.jpeg_quality}
             ],
