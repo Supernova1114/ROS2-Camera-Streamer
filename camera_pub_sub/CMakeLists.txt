@@ -50,7 +50,7 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME})
 
 install(
-    DIRECTORY resources
+    DIRECTORY resources launch
     DESTINATION share/${PROJECT_NAME})
 
     
