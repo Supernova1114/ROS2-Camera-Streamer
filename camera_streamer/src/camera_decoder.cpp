@@ -7,8 +7,18 @@ void topic_callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg, rclcpp:
     publisher->publish(*msg);
 }
 
+void exit_signal_callback(int signum)
+{
+    signum = signum; // Prevent ununsed param warning.
+    rclcpp::shutdown();
+    exit(0);
+}
+
 int main(int argc, char ** argv)
 {
+    // Register signal handlers
+    signal(SIGINT, exit_signal_callback);
+
     const int QUEUE_SIZE = 1;
 
     rclcpp::init(argc, argv);

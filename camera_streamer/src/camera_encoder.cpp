@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <signal.h>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/header.hpp"
@@ -15,8 +16,7 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/videoio.hpp"
 
-#include "custom_interfaces/srv/set_resolution.hpp"
-#include "custom_interfaces/srv/set_frame_rate.hpp"
+#include "custom_interfaces/srv/set_encoder_config.hpp"
 #include "usb_device.h"
 
 
@@ -65,7 +65,8 @@ void build_gstreamer_api()
 
 bool set_resolution(int width, int height)
 {
-    if (width <= cameraCapWidth && height <= cameraCapHeight)
+    if (width <= cameraCapWidth && height <= cameraCapHeight
+        && width > 0 && height > 0)
     {
         imageSendWidth = width;
         imageSendHeight = height;
@@ -78,7 +79,7 @@ bool set_resolution(int width, int height)
 
 bool set_framerate(int fps)
 {
-    if (fps <= cameraCapFPS)
+    if (fps <= cameraCapFPS && fps > 0)
     {
         imageSendFPS = fps;
         return true;
@@ -125,20 +126,40 @@ void toggle_camera_srv_process(const std::shared_ptr<std_srvs::srv::SetBool::Req
     response->success = toggle_camera(request->data);
 }
 
-void set_resolution_srv_process(const std::shared_ptr<custom_interfaces::srv::SetResolution::Request> request,
-          std::shared_ptr<custom_interfaces::srv::SetResolution::Response> response)
+void set_enc_cfg_srv_process(const std::shared_ptr<custom_interfaces::srv::SetEncoderConfig::Request> request,
+          std::shared_ptr<custom_interfaces::srv::SetEncoderConfig::Response> response)
 {
-    response->success = set_resolution(request->width, request->height);
+    bool success = true;
+    std::string error_msg = "";
+
+    if (set_resolution(request->image_width, request->image_height) == false)
+    {
+        error_msg += "Error: Could not set image resolution!\n";
+        success = false;
+    }
+
+    if (set_framerate(request->frame_rate) == false)
+    {
+        error_msg += "Error: Could not set encoder framerate!\n";
+        success = false;
+    }
+
+    response->error_msg = error_msg;
+    response->success = success;
 }
 
-void set_framerate_srv_process(const std::shared_ptr<custom_interfaces::srv::SetFrameRate::Request> request,
-          std::shared_ptr<custom_interfaces::srv::SetFrameRate::Response> response)
+void exit_signal_callback(int signum)
 {
-    response->success = set_framerate(request->frame_rate);
+    signum = signum; // Prevent ununsed param warning.
+    rclcpp::shutdown();
+    exit(0);
 }
 
 int main(int argc, char ** argv)
 {
+    // Register signal handlers
+    signal(SIGINT, exit_signal_callback);
+
     rclcpp::init(argc, argv);
 
     rclcpp::NodeOptions options;
@@ -182,9 +203,7 @@ int main(int argc, char ** argv)
 
     std::string base_topic = camera_name + "/transport";
     std::string toggle_srv_name = camera_name + "/toggle_camera";
-    // std::string request_image_srv_name = camera_name + "/request_image";
-    std::string request_image_pub_name = camera_name + "/request_image_pub";
-    std::string set_resolution_srv_name = camera_name + "/set_resolution";
+    std::string set_enc_cfg_srv_name = camera_name + "/set_encoder_config";
     std::string set_framerate_srv_name = camera_name + "/set_framerate";
 
     // TODO - Switch to image_transport::CameraPublisher to get access to qos
@@ -194,11 +213,8 @@ int main(int argc, char ** argv)
     auto toggle_camera_srv = 
         node->create_service<std_srvs::srv::SetBool>(toggle_srv_name, &toggle_camera_srv_process);
 
-    auto set_resolution_srv =
-        node->create_service<custom_interfaces::srv::SetResolution>(set_resolution_srv_name, &set_resolution_srv_process);
-
-    auto set_framerate_srv =
-        node->create_service<custom_interfaces::srv::SetFrameRate>(set_framerate_srv_name, &set_framerate_srv_process);
+    auto set_encoder_config_srv =
+        node->create_service<custom_interfaces::srv::SetEncoderConfig>(set_enc_cfg_srv_name, &set_enc_cfg_srv_process);
 
     device_path = get_device_path(serial_ID);
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(camera_pub_sub)
+project(camera_streamer)
 
 #Default to C++14
 #if(NOT CMAKE_CXX_STANDARD)
@@ -37,16 +37,16 @@ ament_target_dependencies(camera_decoder rclcpp sensor_msgs image_transport cv_b
 add_executable(camera_viewer src/camera_viewer.cpp)
 ament_target_dependencies(camera_viewer rclcpp sensor_msgs image_transport cv_bridge OpenCV)
 
-# Camera toggle tester
-add_executable(camera_toggle_test src/camera_toggle_test.cpp)
-ament_target_dependencies(camera_toggle_test rclcpp std_srvs)
+# Camera encoder config tester
+add_executable(encoder_config_test src/encoder_config_test.cpp)
+ament_target_dependencies(encoder_config_test rclcpp std_srvs custom_interfaces)
 
 
 install(TARGETS
   camera_encoder
   camera_decoder
   camera_viewer
-  camera_toggle_test
+  encoder_config_test
   DESTINATION lib/${PROJECT_NAME})
 
 install(

@@ -2,7 +2,7 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from dataclasses import dataclass
 
-ENABLE_WINDOW_VIEW = False
+ENABLE_WINDOW_VIEW = True
 IMAGE_TRANSPORT = "compressed"
 
 @dataclass
@@ -14,7 +14,7 @@ class CameraDecoder():
     def get_node(self) -> Node:
         
         camera_decoder_node = Node(
-            package = 'camera_pub_sub',
+            package = 'camera_streamer',
             executable = 'camera_decoder',
             name = self.camera_name + "_dec",
             output='screen',
@@ -36,7 +36,7 @@ class CameraViewer():
     def get_node(self) -> Node:
         
         camera_viewer_node = Node(
-            package='camera_pub_sub',
+            package='camera_streamer',
             executable='camera_viewer',
             name = self.camera_name + "_view",
             output='screen',
@@ -53,14 +53,15 @@ class CameraViewer():
 def generate_launch_description():
 
     camera_list = [
-        CameraDecoder("camera_forearm"),
-        CameraDecoder("camera_ee_down"),
-        CameraDecoder("camera_ee_forward"),
+        # CameraDecoder("camera_forearm"),
+        # CameraDecoder("camera_ee_down"),
+        # CameraDecoder("camera_ee_forward"),
         #CameraDecoder("camera_front_right"),
         #CameraDecoder("camera_front_left"),
         #CameraDecoder("camera_back_right"),
         #CameraDecoder("camera_back_left"),
-        CameraDecoder("camera_mast"),
+        # CameraDecoder("camera_mast"),
+        CameraDecoder("laptop_webcam_test"),
     ]
 
     node_list = []
