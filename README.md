@@ -15,3 +15,4 @@ Tested using ROS 2 Humble
 TODO - add info about enabling video feed from decoder.
 Add info regarding config tester.
 Add info regarding being able to use rqt_image_viewer
+Add info on services / subscriptions.
