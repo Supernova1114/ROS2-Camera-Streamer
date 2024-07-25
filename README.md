@@ -10,8 +10,9 @@ Tested using ROS 2 Humble, Jetson Linux, Jetson AGX Orin.
 2. Set the proper host machine architecture using `HOST_MACHINE` within `encoder.launch.py`.
 3. Add `CameraEncoder` objects to the `encoder.launch.py` file, and give each a **camera name** and **serial ID**.
 4. Add `CameraDecoder` objects to the `decoder.launch.py` file, and specify the **camera name**.
-5. Run `ros2 launch camera_streamer encoder.launch.py` to start the encoder.
-6. Run `ros2 launch camera_streamer decoder.launch.py` to start the decoder.
+5. Build the package using `colcon build`
+6. Run `ros2 launch camera_streamer encoder.launch.py` to start the encoder.
+7. Run `ros2 launch camera_streamer decoder.launch.py` to start the decoder.
 
 ## Publishers
 - Topic: `<camera_name>/out`, Type: `Image`, QoS: `SensorData`; Video feed output.
