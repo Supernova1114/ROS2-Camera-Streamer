@@ -1,11 +1,11 @@
 # Camera-Streaming-System
 A camera streaming system for ROS 2
 <br>
-Tested using ROS 2 Humble
+Tested using ROS 2 Humble, Ubuntu 22.04, amd64 system.
+Tested using ROS 2 Humble, Jetson Linux, Jetson AGX Orin.
 
-
-## How to use:
-1. Find the serial ID for the camera devices using the `find_devpath.bash` file within the `resources/` folder.
+## Usage:
+1. Find the **serial ID** for the USB camera devices using the `find_devpath.bash` file within the `resources/` folder.
 2. Set the proper host machine architecture using `HOST_MACHINE` within `encoder.launch.py`.
 3. Add `CameraEncoder` objects to the `encoder.launch.py` file, and give each `CameraDecoder` a **camera name** and **serial ID**.
 4. Add `CameraDecoder` objects to the `decoder.launch.py` file, and specify the **camera name**.
