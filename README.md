@@ -22,13 +22,4 @@ Tested using ROS 2 Humble
 - To use the built-in camera viewer, enable `ENABLE_WINDOW_VIEW` within `decoder.launch.py`.
 - JPEG image compression can be set using the `JPEG_COMPRESSION` variable within `decoder.launch.py`.
 - Set cameras to auto enable on encoder startup using `AUTO_ENABLE_CAMERAS` within `encoder.launch.py`.
-- Package contains a launch file with example code to test camera toggle and encoder config service functionality.
-
-## Notes:
-- 
-
-TODO - add info about enabling video feed from decoder.
-Add info regarding config tester.
-Add info regarding being able to use rqt_image_viewer
-Add info on services / subscriptions.
-Add info regarding changing compression param.
+- Test encoder services using `ros2 launch camera_streamer config_test.launch.py`. Make sure the correct **camera name** is specified.
