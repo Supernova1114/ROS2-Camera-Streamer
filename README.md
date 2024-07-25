@@ -15,14 +15,17 @@ Tested using ROS 2 Humble
 ## Publishers
 - Topic: `<camera_name>/out`, Type: `Image`, QOS: SensorData, // Video feed output.
 ## Services
-- Service: `<camera_name>/toggle_camera`, Type: `std_srvs/SetBool`; Toggle the camera feed on or off. (Will release the USB owner).
+- Service: `<camera_name>/toggle_camera`, Type: `std_srvs/SetBool`; Toggle the camera feed on or off. (Will also release the USB device).
 - Service: `<camera_name>/set_encoder_config`, Type: `SetEncoderConfig`; Set encoder parameters such as resolution and frame rate.
 
-## Notes:
+## Extra Features:
 - To use the built-in camera viewer, enable `ENABLE_WINDOW_VIEW` within `decoder.launch.py`.
 - JPEG image compression can be set using the `JPEG_COMPRESSION` variable within `decoder.launch.py`.
-- Have only been able to get 2 cameras working per physical USB controller. This seems to be due to limited available bandwidth on the USB controller.
-Or GStreamer is not configured properly to allocate less memory on the controller.
+- Set cameras to auto enable on encoder startup using `AUTO_ENABLE_CAMERAS` within `encoder.launch.py`.
+- Package contains a launch file with example code to test camera toggle and encoder config service functionality.
+
+## Notes:
+- 
 
 TODO - add info about enabling video feed from decoder.
 Add info regarding config tester.
