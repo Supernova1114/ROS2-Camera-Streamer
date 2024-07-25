@@ -26,4 +26,4 @@ Tested using ROS 2 Humble, Jetson Linux, Jetson AGX Orin.
 - Test encoder services using `ros2 launch camera_streamer config_test.launch.py`. Make sure the **camera name** is specified.
 
 ## Notes:
-- Seem to only be able to use two cameras per physical USB controller. May need to update GStreamer API configuration to allocate less memory the camera?
+- Seem to only be able to use two cameras per physical USB controller. May need to update GStreamer API configuration to allocate less memory to the device?
