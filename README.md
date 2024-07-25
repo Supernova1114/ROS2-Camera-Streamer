@@ -24,3 +24,6 @@ Tested using ROS 2 Humble, Jetson Linux, Jetson AGX Orin.
 - JPEG image compression can be set using the `JPEG_COMPRESSION` variable within `encoder.launch.py`.
 - Set cameras to auto enable on encoder startup using `AUTO_ENABLE_CAMERAS` within `encoder.launch.py`.
 - Test encoder services using `ros2 launch camera_streamer config_test.launch.py`. Make sure the **camera name** is specified.
+
+## Notes:
+- Seem to only be able to use two cameras per physical USB controller. May need to update GStreamer API configuration to allocate less memory the camera?
