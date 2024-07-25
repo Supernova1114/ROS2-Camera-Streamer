@@ -204,7 +204,6 @@ int main(int argc, char ** argv)
     std::string base_topic = camera_name + "/transport";
     std::string toggle_srv_name = camera_name + "/toggle_camera";
     std::string set_enc_cfg_srv_name = camera_name + "/set_encoder_config";
-    std::string set_framerate_srv_name = camera_name + "/set_framerate";
 
     // TODO - Switch to image_transport::CameraPublisher to get access to qos
     image_transport::ImageTransport transport(node);
