@@ -3,7 +3,7 @@ A camera streaming system for ROS 2
 <br><br>
 Tested using ROS 2 Humble, Ubuntu 22.04, amd64 laptop.
 <br>
-Tested using ROS 2 Humble, Jetson Linux, Jetson AGX Orin.
+Tested using ROS 2 Humble, Jetson Linux DP 6.0, Jetson AGX Orin.
 
 ## Usage:
 1. Find the **serial ID** for the USB camera devices using the `find_devpath.bash` file within the `resources/` folder.
