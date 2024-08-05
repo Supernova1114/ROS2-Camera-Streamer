@@ -37,4 +37,4 @@ Tested using ROS 2 Humble, Jetson Linux DP 6.0, Jetson AGX Orin.
 // Example from encoder.launch.py for compressed image transport:
 {self.camera_name + '.transport.format': 'jpeg'},
 {self.camera_name + '.transport.jpeg_quality': self.jpeg_quality}
-
+```
