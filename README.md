@@ -34,7 +34,7 @@ Tested using ROS 2 Humble, Jetson Linux DP 6.0, Jetson AGX Orin.
 - Seem to only be able to use two cameras per physical USB controller. May need to update GStreamer API configuration to allocate less memory to the device?
 - Other ROS 2 image transports can potentially be used. Would need to change `IMAGE_TRANSPORT` within `decoder.launch.py` to the name within `ros2 run image_transport list_transports` list, and then add the proper ROS 2 parameters for the transport into `encoder.launch.py`:
 ```
-Example from encoder.launch.py for compressed image transport:
+// Example from encoder.launch.py for compressed image transport:
 {self.camera_name + '.transport.format': 'jpeg'},
 {self.camera_name + '.transport.jpeg_quality': self.jpeg_quality}
 
