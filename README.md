@@ -1,4 +1,4 @@
-# ROS2-Camera-Streaming
+# ROS2-Camera-Streamer
 A camera streaming system for ROS 2
 <br><br>
 Tested using ROS 2 Humble, Ubuntu 22.04, amd64 laptop.
