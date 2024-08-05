@@ -5,6 +5,10 @@ Tested using ROS 2 Humble, Ubuntu 22.04, amd64 laptop.
 <br>
 Tested using ROS 2 Humble, Jetson Linux DP 6.0, Jetson AGX Orin.
 
+## Prerequisites:
+1. Install ROS 2 Compressed Image Transport: `sudo apt install ros-humble-compressed-image-transport`
+2. Make sure Compressed Image Transport is listed: `ros2 run image_transport list_transports`
+
 ## Usage:
 1. Find the **serial ID** for the USB camera devices using the `find_devpath.bash` file within the `resources/` folder.
 2. Set the proper host machine architecture using `HOST_MACHINE` within `encoder.launch.py`.
@@ -28,3 +32,9 @@ Tested using ROS 2 Humble, Jetson Linux DP 6.0, Jetson AGX Orin.
 
 ## Notes:
 - Seem to only be able to use two cameras per physical USB controller. May need to update GStreamer API configuration to allocate less memory to the device?
+- Other ROS 2 image transports can potentially be used. Would need to change `IMAGE_TRANSPORT` within `decoder.launch.py` to the name within `ros2 run image_transport list_transports` list, and then add the proper ROS 2 parameters for the transport into `encoder.launch.py`:
+```
+Example from encoder.launch.py for compressed image transport:
+{self.camera_name + '.transport.format': 'jpeg'},
+{self.camera_name + '.transport.jpeg_quality': self.jpeg_quality}
+
