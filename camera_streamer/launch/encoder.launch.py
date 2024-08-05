@@ -44,6 +44,8 @@ class CameraEncoder():
                 {'image_send_fps': self.send_framerate},
                 {'auto_enable_camera': self.auto_enable},
                 {'host_machine': self.host_machine},
+
+                # Specific to compressed image transport
                 {self.camera_name + '.transport.format': 'jpeg'},
                 {self.camera_name + '.transport.jpeg_quality': self.jpeg_quality}
             ],
