@@ -8,9 +8,11 @@ Tested using ROS 2 Humble, Jetson Linux DP 6.0, Jetson AGX Orin.
 ## Prerequisites:
 1. Install ROS 2 Compressed Image Transport: `sudo apt install ros-humble-compressed-image-transport`
 2. Make sure Compressed Image Transport is listed: `ros2 run image_transport list_transports`
+3. OpenCV 4.x
+4. libsystemd-dev: `sudo apt install libsystemd-dev`
 
 ## Usage:
-1. Find the **serial ID** for the USB camera devices using the `find_devpath.bash` file within the `resources/` folder.
+1. Find the **serial ID** for the USB camera devices using the `find_devpath.bash` file within the `utils/` folder.
 2. Set the proper host machine architecture using `HOST_MACHINE` within `encoder.launch.py`.
 3. Add `CameraEncoder` objects to the `encoder.launch.py` file, and give each a **camera name** and **serial ID**.
 4. Add `CameraDecoder` objects to the `decoder.launch.py` file, and specify the **camera name**.
