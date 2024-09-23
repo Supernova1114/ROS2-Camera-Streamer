@@ -149,10 +149,16 @@ void set_enc_cfg_srv_process(const std::shared_ptr<custom_interfaces::srv::SetEn
 }
 
 void exit_signal_callback(int signum)
-{
-    signum = signum; // Prevent ununsed param warning.
+{	
+	if (signum == SIGINT)
+	{
+		signum = 0;
+	}
+
+	std::cout << "Exiting safely..." << std::endl;
+	videoCapture.release();
     rclcpp::shutdown();
-    exit(0);
+    exit(signum);
 }
 
 int main(int argc, char ** argv)
@@ -215,13 +221,13 @@ int main(int argc, char ** argv)
     auto set_encoder_config_srv =
         node->create_service<custom_interfaces::srv::SetEncoderConfig>(set_enc_cfg_srv_name, &set_enc_cfg_srv_process);
 
-    device_path = get_device_path(serial_ID);
+    device_path = get_device_path(serial_ID, "/dev/video");
 
     if (device_path.empty()) {
         std::cout << "ERROR! Device not found: {name: "
         << camera_name << ", serial_ID: " 
         << serial_ID << "}" << std::endl;
-        return 1;
+        exit_signal_callback(1);
     }
     else
     {   
@@ -259,6 +265,6 @@ int main(int argc, char ** argv)
         rclcpp::spin_some(node);
         std::this_thread::sleep_for(std::chrono::milliseconds((1000 / imageSendFPS)));
     }
-
+	
     return 0;
 }

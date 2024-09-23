@@ -20,14 +20,15 @@ find_package(image_transport REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV 4 REQUIRED)
 find_package(custom_interfaces REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SYSTEMD REQUIRED IMPORTED_TARGET libsystemd)
 
-# find_package(PkgConfig REQUIRED)
-# pkg_check_modules(libusb REQUIRED libusb-1.0)
-# pkg_check_modules(libudev REQUIRED libudev)
+
 
 # Camera encoder
-add_executable(camera_encoder src/camera_encoder.cpp src/usb_device.cpp src/helper_functions.cpp)
+add_executable(camera_encoder src/camera_encoder.cpp src/usb_device.cpp)
 ament_target_dependencies(camera_encoder rclcpp sensor_msgs std_srvs image_transport cv_bridge OpenCV custom_interfaces)
+target_link_libraries(camera_encoder PkgConfig::SYSTEMD)
 
 # Camera decoder
 add_executable(camera_decoder src/camera_decoder.cpp)
@@ -50,7 +51,7 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME})
 
 install(
-    DIRECTORY resources launch
+    DIRECTORY launch
     DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)

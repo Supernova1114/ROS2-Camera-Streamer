@@ -1,53 +1,79 @@
 #include "usb_device.h"
 
-std::string get_usb_devices() {
+/*
+Uses libsystemd to get access to sd api (pretty much udev).
+View potential device params ex: "udevadm info /dev/video0"
+*/
 
-    std::string package_share_directory = ament_index_cpp::get_package_share_directory("camera_pub_sub");
-    std::string script_path = package_share_directory + "/resources/find_devpath.bash";
+// Gets a list of devices active connected to the computer.
+// Returns a list of pairs of (serial_ID, device_path).
+std::vector<std::pair<std::string, std::string>> get_device_list() 
+{
+    std::vector<std::pair<std::string, std::string>> device_list;
+    
+    sd_device_enumerator *enumerator = nullptr;
 
-    std::string command = "chmod +x " + script_path;
-    
-    system(command.c_str());
-    
-    return exec(script_path.c_str());
+    sd_device_enumerator_new(&enumerator);
+
+    if (enumerator == nullptr) {
+        std::cout << "ERROR: Unable to allocate new device enumerator!" << std::endl;
+        return device_list;
+    }
+
+    sd_device *device = sd_device_enumerator_get_device_first(enumerator);
+
+    while (device != nullptr)
+    {
+        const char* device_path = nullptr;
+        const char* serial_ID = nullptr;
+        
+        sd_device_get_property_value(device, "DEVNAME", &device_path);
+        sd_device_get_property_value(device, "ID_SERIAL", &serial_ID);
+
+        if (device_path != nullptr && serial_ID != nullptr)
+        {
+            device_list.push_back(std::make_pair(serial_ID, device_path));
+        }
+
+        device = sd_device_enumerator_get_device_next(enumerator);
+    }
+
+    sd_device_enumerator_unref(enumerator);
+
+    return device_list;
 }
 
-std::string get_device_path(std::string serial_ID)
+// Returns a device path given the udev serial ID and a keyword to
+// compare to a viable device path.
+std::string get_device_path(std::string serial_ID, std::string path_hint)
 {
-    std::string device_list = get_usb_devices();
+    std::vector<std::pair<std::string, std::string>> device_list = get_device_list();
 
-    std::istringstream stream(device_list);
-    std::string line;
-    std::string delimiter = " - ";
-    std::string keyword = "video";
-
-    std::string device_path_found = "";
-
-    while (std::getline(stream, line)) 
+    for (auto info_pair : device_list)
     {
-        int delimiter_index = line.find(delimiter);
+        std::string id = info_pair.first;
 
-        std::string device_path = line.substr(0, delimiter_index);
-
-        size_t keyword_index = device_path.find(keyword);
-
-        // Get rid of device paths that are not video feeds
-        if (keyword_index == std::string::npos)
-            continue;
-        
-        // Get rid of odd numbered dev paths for /dev/video#
-        // odd numbers are for camera control rather than image output
-        if ((int(device_path[device_path.length() - 1]) - 48) % 2 == 1) {
-            continue;
-        }
-        
-        std::string serial_number = line.substr(delimiter_index + delimiter.length());
-
-        if (serial_number == serial_ID) 
+        if (id == serial_ID)
         {
-            device_path_found = device_path;
+            std::string device_path = info_pair.second;
+
+            // Check if path contains path hint.
+            size_t path_hint_index = device_path.find(path_hint);
+
+            // Ignore if does not contain path hint.
+            if (path_hint_index == std::string::npos)
+                continue;
+            
+            // TODO - Replace this with check for ID_V4L_CAPABILITIES=:capture:
+            // Get rid of odd numbered dev paths for /dev/video#
+            // odd numbers are for camera control rather than image output
+            if ((int(device_path[device_path.length() - 1]) - 48) % 2 == 1) {
+                continue;
+            }
+
+            return device_path;
         }
     }
 
-    return device_path_found;
+    return "";
 }
