@@ -53,7 +53,6 @@ class CameraViewer():
 def generate_launch_description():
 
     camera_list = [
-        CameraDecoder("logi_webcam"),
         CameraDecoder("laptop_webcam"),
     ]
 

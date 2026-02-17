@@ -19,7 +19,7 @@ find_package(std_srvs REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV 4 REQUIRED)
-find_package(custom_interfaces REQUIRED)
+find_package(camera_streamer_interfaces REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SYSTEMD REQUIRED IMPORTED_TARGET libsystemd)
 
@@ -27,7 +27,7 @@ pkg_check_modules(SYSTEMD REQUIRED IMPORTED_TARGET libsystemd)
 
 # Camera encoder
 add_executable(camera_encoder src/camera_encoder.cpp src/usb_device.cpp)
-ament_target_dependencies(camera_encoder rclcpp sensor_msgs std_srvs image_transport cv_bridge OpenCV custom_interfaces)
+ament_target_dependencies(camera_encoder rclcpp sensor_msgs std_srvs image_transport cv_bridge OpenCV camera_streamer_interfaces)
 target_link_libraries(camera_encoder PkgConfig::SYSTEMD)
 
 # Camera decoder
@@ -40,7 +40,7 @@ ament_target_dependencies(camera_viewer rclcpp sensor_msgs image_transport cv_br
 
 # Camera encoder config tester
 add_executable(encoder_config_test src/encoder_config_test.cpp)
-ament_target_dependencies(encoder_config_test rclcpp std_srvs custom_interfaces)
+ament_target_dependencies(encoder_config_test rclcpp std_srvs camera_streamer_interfaces)
 
 
 install(TARGETS

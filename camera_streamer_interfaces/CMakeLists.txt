@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(custom_interfaces)
+project(camera_streamer_interfaces)
 
 # Default to C++17
 if(NOT CMAKE_CXX_STANDARD)

@@ -9,7 +9,7 @@ def generate_launch_description():
         name='encoder_config_test',
         output='screen',
         parameters=[
-            {"camera_name": "laptop_webcam_test"},
+            {"camera_name": "laptop_webcam"},
             {"toggle_camera": True},
             {"image_width": 500},
             {"image_height": 500},

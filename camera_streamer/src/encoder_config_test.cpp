@@ -1,7 +1,7 @@
 #include <string.h>
 #include "rclcpp/rclcpp.hpp"
 #include "std_srvs/srv/set_bool.hpp"
-#include "custom_interfaces/srv/set_encoder_config.hpp"
+#include "camera_streamer_interfaces/srv/set_encoder_config.hpp"
 
 
 int main(int argc, char ** argv)
@@ -35,13 +35,13 @@ int main(int argc, char ** argv)
         node->create_client<std_srvs::srv::SetBool>(toggle_camera_srv_name);
 
     auto set_encoder_config_cli =
-        node->create_client<custom_interfaces::srv::SetEncoderConfig>(set_enc_cfg_srv_name);
+        node->create_client<camera_streamer_interfaces::srv::SetEncoderConfig>(set_enc_cfg_srv_name);
 
     // Create service requests -----------------
 
     auto toggle_camera_request = std::make_shared<std_srvs::srv::SetBool::Request>();
 
-    auto set_encoder_config_request = std::make_shared<custom_interfaces::srv::SetEncoderConfig::Request>();
+    auto set_encoder_config_request = std::make_shared<camera_streamer_interfaces::srv::SetEncoderConfig::Request>();
     
     // Assign data to request ------------------------------
 

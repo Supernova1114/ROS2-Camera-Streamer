@@ -57,7 +57,6 @@ class CameraEncoder():
 def generate_launch_description():
 
     camera_list = (
-        CameraEncoder("logi_webcam", "046d_C922_Pro_Stream_Webcam_F5B8DF8F"),
         CameraEncoder("laptop_webcam", "SunplusIT_Inc_HD_User_Facing"),
     )
     

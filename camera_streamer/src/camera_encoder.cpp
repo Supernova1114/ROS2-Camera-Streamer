@@ -16,7 +16,7 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/videoio.hpp"
 
-#include "custom_interfaces/srv/set_encoder_config.hpp"
+#include "camera_streamer_interfaces/srv/set_encoder_config.hpp"
 #include "usb_device.h"
 
 
@@ -126,8 +126,8 @@ void toggle_camera_srv_process(const std::shared_ptr<std_srvs::srv::SetBool::Req
     response->success = toggle_camera(request->data);
 }
 
-void set_enc_cfg_srv_process(const std::shared_ptr<custom_interfaces::srv::SetEncoderConfig::Request> request,
-          std::shared_ptr<custom_interfaces::srv::SetEncoderConfig::Response> response)
+void set_enc_cfg_srv_process(const std::shared_ptr<camera_streamer_interfaces::srv::SetEncoderConfig::Request> request,
+          std::shared_ptr<camera_streamer_interfaces::srv::SetEncoderConfig::Response> response)
 {
     bool success = true;
     std::string error_msg = "";
@@ -219,7 +219,7 @@ int main(int argc, char ** argv)
         node->create_service<std_srvs::srv::SetBool>(toggle_srv_name, &toggle_camera_srv_process);
 
     auto set_encoder_config_srv =
-        node->create_service<custom_interfaces::srv::SetEncoderConfig>(set_enc_cfg_srv_name, &set_enc_cfg_srv_process);
+        node->create_service<camera_streamer_interfaces::srv::SetEncoderConfig>(set_enc_cfg_srv_name, &set_enc_cfg_srv_process);
 
     device_path = get_device_path(serial_ID, "/dev/video");
 
